@@ -1,0 +1,336 @@
+{% extends 'base.html' %}
+
+{% block title %}Search Products - District Marketplace{% endblock %}
+
+{% block extra_css %}
+<style>
+    .search-hero {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 40px 0;
+        margin-bottom: 30px;
+    }
+    .tab-pane { padding-top: 20px; }
+    .product-card {
+        transition: transform 0.2s;
+        height: 100%;
+    }
+    .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 12px rgba(0,0,0,.15);
+    }
+    .product-image {
+        height: 200px;
+        object-fit: cover;
+        width: 100%;
+    }
+    .search-score {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: rgba(102, 126, 234, 0.9);
+        color: white;
+        padding: 5px 10px;
+        border-radius: 15px;
+        font-size: 0.85rem;
+        font-weight: bold;
+    }
+    .filter-section {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+    .no-results {
+        text-align: center;
+        padding: 60px 20px;
+        color: #6c757d;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="search-hero">
+    <div class="container">
+        <h1 class="display-5 fw-bold mb-2">🔍 Search Products</h1>
+        <p class="lead mb-0">Find products using text, voice, or image search</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-body">
+                    <!-- Search Type Tabs -->
+                    <ul class="nav nav-tabs mb-3" id="searchTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="text-tab" data-bs-toggle="tab" data-bs-target="#text-search" type="button">
+                                📝 Text Search
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="voice-tab" data-bs-toggle="tab" data-bs-target="#voice-search" type="button">
+                                🎤 Voice Search
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="image-tab" data-bs-toggle="tab" data-bs-target="#image-search" type="button">
+                                📷 Image Search
+                            </button>
+                        </li>
+                    </ul>
+
+                    <!-- Tab Content -->
+                    <div class="tab-content" id="searchTabContent">
+                        <!-- Text Search -->
+                        <div class="tab-pane fade show active" id="text-search">
+                            <form id="textSearchForm">
+                                <div class="mb-3">
+                                    <label class="form-label">What are you looking for?</label>
+                                    <input type="text" class="form-control form-control-lg" id="searchQuery"
+                                           placeholder="e.g., laptop, fresh vegetables, mobile phone..." required>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-lg">Search</button>
+                            </form>
+                        </div>
+
+                        <!-- Voice Search -->
+                        <div class="tab-pane fade" id="voice-search">
+                            <form id="voiceSearchForm">
+                                <div class="mb-3">
+                                    <label class="form-label">Upload Voice Recording</label>
+                                    <input type="file" class="form-control" id="voiceFile" accept="audio/*" required>
+                                    <small class="text-muted">Supported formats: MP3, WAV, M4A</small>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-lg">Search by Voice</button>
+                            </form>
+                        </div>
+
+                        <!-- Image Search -->
+                        <div class="tab-pane fade" id="image-search">
+                            <form id="imageSearchForm">
+                                <div class="mb-3">
+                                    <label class="form-label">Upload Product Image</label>
+                                    <input type="file" class="form-control" id="imageFile" accept="image/*" required>
+                                    <small class="text-muted">Upload a photo of the product you're looking for</small>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Additional Description (Optional)</label>
+                                    <input type="text" class="form-control" id="imageDescription"
+                                           placeholder="e.g., color preference, size...">
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-lg">Search by Image</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Filters Section -->
+                    <div class="filter-section mt-4" id="filterSection" style="display: none;">
+                        <h6 class="mb-3">🎯 Filters</h6>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label class="form-label">District</label>
+                                <input type="text" class="form-control" id="districtFilter" placeholder="e.g., Jodhpur">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Category</label>
+                                <input type="text" class="form-control" id="categoryFilter" placeholder="e.g., Electronics">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Max Distance (km)</label>
+                                <input type="number" class="form-control" id="maxDistance" placeholder="e.g., 50">
+                            </div>
+                        </div>
+                        <button class="btn btn-secondary mt-3" id="applyFilters">Apply Filters</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div id="loadingIndicator" style="display: none;" class="text-center my-5">
+        <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+            <span class="visually-hidden">Searching...</span>
+        </div>
+        <p class="mt-3 text-muted">Searching for products...</p>
+    </div>
+
+    <!-- Results Section -->
+    <div id="resultsSection" style="display: none;">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 id="resultsTitle">Search Results</h4>
+            <span id="resultsCount" class="badge bg-primary">0 results</span>
+        </div>
+
+        <div id="resultsGrid" class="row">
+            <!-- Results will be inserted here -->
+        </div>
+
+        <div id="noResults" class="no-results" style="display: none;">
+            <h3>😕 No products found</h3>
+            <p>Try adjusting your search query or filters</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]')?.value ||
+                      getCookie('csrftoken');
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    let currentSearchParams = {};
+
+    // Text Search
+    document.getElementById('textSearchForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const query = document.getElementById('searchQuery').value;
+        await performSearch(query, 'text');
+    });
+
+    // Voice Search
+    document.getElementById('voiceSearchForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        alert('Voice search is not yet implemented. Please use text search.');
+    });
+
+    // Image Search
+    document.getElementById('imageSearchForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        alert('Image search is not yet implemented. Please use text search.');
+    });
+
+    // Apply Filters
+    document.getElementById('applyFilters').addEventListener('click', async () => {
+        if (currentSearchParams.query) {
+            await performSearch(
+                currentSearchParams.query,
+                currentSearchParams.search_type,
+                {
+                    district: document.getElementById('districtFilter').value,
+                    category: document.getElementById('categoryFilter').value,
+                    max_distance_km: document.getElementById('maxDistance').value
+                }
+            );
+        }
+    });
+
+    async function performSearch(query, searchType = 'text', filters = {}) {
+        // Show loading
+        document.getElementById('loadingIndicator').style.display = 'block';
+        document.getElementById('resultsSection').style.display = 'none';
+        document.getElementById('filterSection').style.display = 'none';
+
+        currentSearchParams = { query, search_type: searchType, ...filters };
+
+        try {
+            const response = await fetch('/search/api/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken,
+                },
+                body: JSON.stringify(currentSearchParams)
+            });
+
+            if (!response.ok) {
+                throw new Error('Search failed');
+            }
+
+            const data = await response.json();
+            displayResults(data.results, query);
+
+            // Show filters
+            document.getElementById('filterSection').style.display = 'block';
+
+        } catch (error) {
+            console.error('Search error:', error);
+            alert('Search failed: ' + error.message);
+        } finally {
+            document.getElementById('loadingIndicator').style.display = 'none';
+        }
+    }
+
+    function displayResults(results, query) {
+        const resultsSection = document.getElementById('resultsSection');
+        const resultsGrid = document.getElementById('resultsGrid');
+        const resultsCount = document.getElementById('resultsCount');
+        const resultsTitle = document.getElementById('resultsTitle');
+        const noResults = document.getElementById('noResults');
+
+        resultsSection.style.display = 'block';
+        resultsGrid.innerHTML = '';
+
+        if (results.length === 0) {
+            noResults.style.display = 'block';
+            resultsCount.textContent = '0 results';
+            return;
+        }
+
+        noResults.style.display = 'none';
+        resultsCount.textContent = `${results.length} result${results.length !== 1 ? 's' : ''}`;
+        resultsTitle.textContent = `Results for "${query}"`;
+
+        results.forEach(result => {
+            const col = document.createElement('div');
+            col.className = 'col-md-4 mb-4';
+
+            const primaryImage = result.images?.find(img => img.is_primary)?.image ||
+                               result.images?.[0]?.image ||
+                               'https://via.placeholder.com/300x200?text=No+Image';
+
+            const distanceText = result.distance_km !== null && result.distance_km !== undefined
+                ? `📍 ${result.distance_km.toFixed(1)} km away`
+                : '';
+
+            const scorePercent = Math.round(result.search_score * 100);
+
+            col.innerHTML = `
+                <div class="card product-card h-100">
+                    <div class="position-relative">
+                        <img src="${primaryImage}" class="product-image" alt="${result.name}">
+                        <span class="search-score">${scorePercent}%</span>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">${result.name}</h5>
+                        <p class="card-text text-muted small">${result.description?.substring(0, 100) || 'No description'}...</p>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="h5 mb-0 text-primary">₹${result.price}</span>
+                            <span class="badge bg-secondary">${result.category?.name || 'Uncategorized'}</span>
+                        </div>
+                        <div class="small text-muted mb-2">
+                            <div>📦 Quantity: ${result.quantity} ${result.unit}</div>
+                            <div>🏪 Seller: ${result.seller?.username || 'Unknown'}</div>
+                            ${distanceText ? `<div>${distanceText}</div>` : ''}
+                            <div>📍 ${result.district}</div>
+                        </div>
+                        <a href="/products/${result.id}/" class="btn btn-outline-primary w-100">View Details</a>
+                    </div>
+                </div>
+            `;
+
+            resultsGrid.appendChild(col);
+        });
+
+        // Scroll to results
+        resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+</script>
+{% endblock %}

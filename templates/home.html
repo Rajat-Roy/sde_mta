@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="hero">
+    <div class="container">
+        <h1 class="display-4 fw-bold mb-4">AI-Enabled District Marketplace</h1>
+        <p class="lead mb-4">Connecting local sellers and buyers with intelligent multimodal search and listing</p>
+        <div class="row mt-5">
+            <div class="col-md-4">
+                <div class="card bg-white text-dark">
+                    <div class="card-body text-center">
+                        <h3>🎤 Voice Listing</h3>
+                        <p>Describe your product by speaking</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-white text-dark">
+                    <div class="card-body text-center">
+                        <h3>📸 Image Listing</h3>
+                        <p>Upload product photos for AI analysis</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-white text-dark">
+                    <div class="card-body text-center">
+                        <h3>🔍 Smart Search</h3>
+                        <p>Find nearby products with AI-powered search</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container my-5">
+    <h2 class="text-center mb-4">How It Works</h2>
+    <div class="row">
+        <div class="col-md-3 text-center">
+            <div class="display-1">1</div>
+            <h5>Create Listing</h5>
+            <p>Use voice, image, or text</p>
+        </div>
+        <div class="col-md-3 text-center">
+            <div class="display-1">2</div>
+            <h5>AI Processing</h5>
+            <p>Automatic categorization</p>
+        </div>
+        <div class="col-md-3 text-center">
+            <div class="display-1">3</div>
+            <h5>Discovery</h5>
+            <p>Buyers find your products</p>
+        </div>
+        <div class="col-md-3 text-center">
+            <div class="display-1">4</div>
+            <h5>Connect</h5>
+            <p>Complete transactions locally</p>
+        </div>
+    </div>
+
+    <div class="text-center mt-5">
+        <a href="/products/" class="btn btn-primary btn-lg me-2">Browse Products</a>
+        <a href="/ingest/" class="btn btn-outline-primary btn-lg">List Your Product</a>
+    </div>
+</div>
+
+<div class="container my-5">
+    <h2 class="text-center mb-4">Features</h2>
+    <div class="row">
+        <div class="col-md-4">
+            <h5>📍 Location-Based</h5>
+            <p>Find products and sellers near you within your district</p>
+        </div>
+        <div class="col-md-4">
+            <h5>🤖 AI-Powered</h5>
+            <p>Gemini AI automatically structures your product listings</p>
+        </div>
+        <div class="col-md-4">
+            <h5>🚀 Fast & Simple</h5>
+            <p>List products in seconds with multimodal inputs</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
