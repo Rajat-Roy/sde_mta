@@ -1,0 +1,15 @@
+Method,Name,Error,Occurrences
+GET,/products/api/56/,HTTPError('404 Client Error: Not Found for url: /products/api/56/'),1
+GET,/products/api/7/,HTTPError('404 Client Error: Not Found for url: /products/api/7/'),1
+GET,/products/api/37/,HTTPError('404 Client Error: Not Found for url: /products/api/37/'),1
+GET,/products/api/18/,HTTPError('404 Client Error: Not Found for url: /products/api/18/'),1
+GET,/products/api/24/,HTTPError('404 Client Error: Not Found for url: /products/api/24/'),1
+GET,/products/api/89/,HTTPError('404 Client Error: Not Found for url: /products/api/89/'),1
+POST,/search/api/ [Search Products],HTTPError('403 Client Error: Forbidden for url: /search/api/ [Search Products]'),14
+GET,/products/api/16/,HTTPError('404 Client Error: Not Found for url: /products/api/16/'),1
+POST,/search/api/,HTTPError('403 Client Error: Forbidden for url: /search/api/'),21
+GET,/products/api/74/,HTTPError('404 Client Error: Not Found for url: /products/api/74/'),1
+GET,/products/api/21/,HTTPError('404 Client Error: Not Found for url: /products/api/21/'),1
+GET,/products/api/{id}/ [View Product Detail],HTTPError('404 Client Error: Not Found for url: /products/api/{id}/ [View Product Detail]'),4
+GET,/products/api/88/,HTTPError('404 Client Error: Not Found for url: /products/api/88/'),1
+GET,/products/api/22/,HTTPError('404 Client Error: Not Found for url: /products/api/22/'),2
