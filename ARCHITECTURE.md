@@ -246,7 +246,7 @@ sequenceDiagram
     participant GeminiSvc as GeminiService
     participant DB as PostgreSQL
 
-    Buyer->>UI: Enter search query<br/>(e.g., "laptop with good camera")
+    Buyer->>UI: Enter search query<br/>example: laptop with good camera
     UI->>View: POST /search/api/
 
     View->>SearchSvc: search(query, type, location)
@@ -450,33 +450,33 @@ graph LR
 
 ```mermaid
 graph TB
-    Query[User Search Query<br/>"laptop with good camera"]
+    Query[User Search Query<br/>laptop with good camera]
 
-    subgraph "Query Processing"
+    subgraph QueryProc["Query Processing"]
         EmbedQ[Generate Query<br/>Embedding Vector<br/>768 dimensions]
     end
 
-    subgraph "Product Retrieval"
+    subgraph ProdRetrieval["Product Retrieval"]
         Filter[Apply Filters<br/>District, Category,<br/>Active Status]
         FetchDB[(Fetch Products<br/>with Embeddings)]
     end
 
-    subgraph "Similarity Calculation"
-        CosineSim[Compute Cosine<br/>Similarity Score<br/>dot(q,p) / ||q|| * ||p||]
+    subgraph SimCalc["Similarity Calculation"]
+        CosineSim[Compute Cosine<br/>Similarity Score<br/>dot product / norms]
     end
 
-    subgraph "Geo-location Ranking"
+    subgraph GeoRank["Geo-location Ranking"]
         HasLoc{User Has<br/>Location?}
         GeoDist[Calculate Geodesic<br/>Distance in KM<br/>Haversine Formula]
-        DistScore[Distance Score<br/>= 1 / (1 + distance)]
+        DistScore[Distance Score<br/>1 / 1 + distance]
     end
 
-    subgraph "Combined Scoring"
-        WeightedScore[Final Score =<br/>0.7 * Similarity +<br/>0.3 * Distance Score]
-        NoLocScore[Final Score =<br/>Similarity Only]
+    subgraph CombScore["Combined Scoring"]
+        WeightedScore[Final Score<br/>0.7 x Similarity<br/>0.3 x Distance]
+        NoLocScore[Final Score<br/>Similarity Only]
     end
 
-    subgraph "Result Ranking"
+    subgraph Results["Result Ranking"]
         Sort[Sort by<br/>Final Score DESC]
         TopN[Return Top N<br/>Results]
     end
