@@ -6,6 +6,7 @@ router = DefaultRouter()
 router.register(r'categories', views.CategoryViewSet, basename='category')
 router.register(r'products', views.ProductViewSet, basename='product')
 router.register(r'reviews', views.ReviewViewSet, basename='review')
+router.register(r'contact-messages', views.ContactMessageViewSet, basename='contact-message')
 
 app_name = 'products'
 

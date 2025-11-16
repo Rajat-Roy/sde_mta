@@ -123,3 +123,24 @@ class Review(models.Model):
         db_table = 'reviews'
         ordering = ['-created_at']
         unique_together = ['product', 'buyer']
+
+
+class ContactMessage(models.Model):
+    """Messages from buyers to sellers about products."""
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='contact_messages')
+    sender = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='sent_messages')
+
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    phone = models.CharField(max_length=20, blank=True, null=True)
+    message = models.TextField()
+
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.sender.username} → {self.product.seller.username} about {self.product.name}"
+
+    class Meta:
+        db_table = 'contact_messages'
+        ordering = ['-created_at']

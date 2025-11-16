@@ -15,6 +15,18 @@ This project presents the architectural design of a scalable modular monolith sy
 - **District-Bounded:** Commerce confined to local district for community-scale operations
 - **Order Management:** Complete order tracking, invoicing, and delivery management
 
+## Demo Video
+
+<div align="center">
+  <a href="https://drive.google.com/file/d/1Z4rorIgbIwWkTZFpoVHnLqIRCemeBDw4/view?usp=sharing">
+    <img src="https://drive.google.com/thumbnail?id=1Z4rorIgbIwWkTZFpoVHnLqIRCemeBDw4&sz=w1000" alt="Demo Video" width="640" />
+  </a>
+
+  <p><em>Click the thumbnail above to watch the full demo video</em></p>
+
+  **See the platform in action, demonstrating multimodal product listing, AI-powered ingestion**
+</div>
+
 ## Architecture
 
 **Full architectural documentation with diagrams:** See [ARCHITECTURE.md](ARCHITECTURE.md)

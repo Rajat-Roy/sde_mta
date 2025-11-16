@@ -14,6 +14,43 @@
     </div>
 </div>
 
+<!-- Contact Seller Modal -->
+<div class="modal fade" id="contactModal" tabindex="-1" aria-labelledby="contactModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="contactModalLabel">Contact Seller</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="contactForm">
+                    <div class="mb-3">
+                        <label for="senderName" class="form-label">Your Name</label>
+                        <input type="text" class="form-control" id="senderName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="senderEmail" class="form-label">Your Email</label>
+                        <input type="email" class="form-control" id="senderEmail" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="senderPhone" class="form-label">Your Phone (Optional)</label>
+                        <input type="tel" class="form-control" id="senderPhone">
+                    </div>
+                    <div class="mb-3">
+                        <label for="message" class="form-label">Message</label>
+                        <textarea class="form-control" id="message" rows="4" required></textarea>
+                    </div>
+                    <div id="contactFormAlert"></div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="submitContactForm()">Send Message</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 const productId = {{ product_id }};
 
@@ -202,8 +239,78 @@ async function loadReviews() {
     }
 }
 
+// Get CSRF token from cookie
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
 function contactSeller() {
-    alert('Contact seller functionality coming soon! This would open a messaging interface or show seller contact details.');
+    // Show the modal
+    const modal = new bootstrap.Modal(document.getElementById('contactModal'));
+    modal.show();
+}
+
+async function submitContactForm() {
+    const name = document.getElementById('senderName').value;
+    const email = document.getElementById('senderEmail').value;
+    const phone = document.getElementById('senderPhone').value;
+    const message = document.getElementById('message').value;
+    const alertDiv = document.getElementById('contactFormAlert');
+
+    // Validate form
+    if (!name || !email || !message) {
+        alertDiv.innerHTML = '<div class="alert alert-danger">Please fill in all required fields.</div>';
+        return;
+    }
+
+    // Show loading state
+    alertDiv.innerHTML = '<div class="alert alert-info">Sending message...</div>';
+
+    const csrftoken = getCookie('csrftoken');
+
+    try {
+        const response = await fetch('/products/api/contact-messages/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken,
+            },
+            body: JSON.stringify({
+                product: productId,
+                name: name,
+                email: email,
+                phone: phone,
+                message: message
+            })
+        });
+
+        if (response.ok) {
+            alertDiv.innerHTML = '<div class="alert alert-success">Message sent successfully! The seller will contact you soon.</div>';
+            // Clear form
+            document.getElementById('contactForm').reset();
+            // Close modal after 2 seconds
+            setTimeout(() => {
+                bootstrap.Modal.getInstance(document.getElementById('contactModal')).hide();
+                alertDiv.innerHTML = '';
+            }, 2000);
+        } else {
+            const error = await response.json();
+            alertDiv.innerHTML = `<div class="alert alert-danger">Error: ${JSON.stringify(error)}</div>`;
+        }
+    } catch (error) {
+        alertDiv.innerHTML = `<div class="alert alert-danger">Error sending message: ${error.message}</div>`;
+    }
 }
 
 // Load product on page load

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Category, Product, ProductImage, Review
+from .models import Category, Product, ProductImage, Review, ContactMessage
 from users.models import User
 
 
@@ -107,3 +107,19 @@ class ReviewSerializer(serializers.ModelSerializer):
         if value < 1 or value > 5:
             raise serializers.ValidationError("Rating must be between 1 and 5")
         return value
+
+
+class ContactMessageSerializer(serializers.ModelSerializer):
+    """Serializer for ContactMessage model."""
+    sender_name = serializers.CharField(source='sender.username', read_only=True)
+    product_name = serializers.CharField(source='product.name', read_only=True)
+
+    class Meta:
+        model = ContactMessage
+        fields = ['id', 'product', 'sender_name', 'product_name', 'name', 'email', 'phone', 'message', 'created_at']
+        read_only_fields = ['created_at', 'sender_name', 'product_name']
+
+    def create(self, validated_data):
+        # Set sender from request user
+        validated_data['sender'] = self.context['request'].user
+        return super().create(validated_data)

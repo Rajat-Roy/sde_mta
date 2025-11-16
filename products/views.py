@@ -3,11 +3,13 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from django.shortcuts import render
+from django.db import models
 
-from .models import Category, Product, ProductImage, Review
+from .models import Category, Product, ProductImage, Review, ContactMessage
 from .serializers import (
     CategorySerializer, ProductListSerializer, ProductDetailSerializer,
-    ProductCreateSerializer, ProductImageSerializer, ReviewSerializer
+    ProductCreateSerializer, ProductImageSerializer, ReviewSerializer,
+    ContactMessageSerializer
 )
 
 
@@ -72,3 +74,22 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(buyer=self.request.user)
+
+
+class ContactMessageViewSet(viewsets.ModelViewSet):
+    """ViewSet for contact messages."""
+    queryset = ContactMessage.objects.all()
+    serializer_class = ContactMessageSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        """Filter messages: sellers see received messages, buyers see sent messages."""
+        user = self.request.user
+        # Get messages where user is either the sender or the product seller
+        return ContactMessage.objects.filter(
+            models.Q(sender=user) | models.Q(product__seller=user)
+        ).select_related('product', 'sender')
+
+    def perform_create(self, serializer):
+        """Create a new contact message."""
+        serializer.save(sender=self.request.user)
